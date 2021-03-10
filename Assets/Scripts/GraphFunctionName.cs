@@ -1,4 +1,7 @@
-﻿public enum GraphFunctionName
+﻿/// <summary>
+/// 图形显示函数名
+/// </summary>
+public enum GraphFunctionName
 {
     Sine,
     Sine2D,

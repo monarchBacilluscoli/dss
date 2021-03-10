@@ -3,40 +3,36 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+/// <summary>
+/// 函数图形显示逻辑
+/// </summary>
 public class Graph : MonoBehaviour
 {
     /// <summary>
-    /// The prefab used to display a point on a funcion
+    /// 用于表示点的预制体
     /// </summary>
     public Transform PointPrefab;
 
     /// <summary>
-    /// The distance from start to end position of the x
+    /// 点的分辨率
     /// </summary>
-    public float m_range = 2f;
-
-    /// <summary>
-    /// The number of the points
-    /// </summary>
+    /// <remarks>
+    /// 越大点越密
+    /// </remarks>
     [Range(10, 100)]
     public int m_resolution = 10;
 
     /// <summary>
-    /// All the points to display a funcion
+    /// 所有用于显示的点
     /// </summary>
     Transform[] points;
 
     /// <summary>
-    /// whether to display a full plane
-    /// </summary>
-    public bool m_isDisplayFullDomain;
-
-    /// <summary>
-    /// Triggered when awake
+    /// 脚本被加载时调用
     /// </summary>
     void Awake()
     {
-        // 1. Display a full plane
+        // 1. 显示一整个面（用于查看shader的效果）
         float step = 2.0f / m_resolution;
         Vector3 scale = Vector3.one * step;
         Vector3 position;
@@ -52,7 +48,7 @@ public class Graph : MonoBehaviour
                 point.localScale = scale;
             }
         }
-        // 2. Initialize all function points and store them
+        // 2. 初始化所有点并存储之
         position = Vector3.zero;
         points = new Transform[m_resolution];
         for (int i = 0; i < points.Length; i++)
@@ -65,14 +61,15 @@ public class Graph : MonoBehaviour
     }
 
     /// <summary>
-    /// Triggered at each frame
+    /// 每帧被调用
     /// </summary>
     void Update()
     {
-        // 1. update function points
+        // 1. 设定图形绘制的当前参数
         float step = 2.0f / m_resolution;
         Vector3 position;
         position.z = 0;
+        // 2. 修改点的当前位置
         for (int i = 0; i < points.Length; i++)
         {
             position.x = (i + 0.5f) * step - 1f;

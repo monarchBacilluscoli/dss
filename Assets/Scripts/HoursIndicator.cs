@@ -5,44 +5,55 @@ using UnityEngine;
 public class HoursIndicator : MonoBehaviour
 {
     /// <summary>
-    /// use to store the original color
+    /// 存储indicator初始材质颜色
     /// </summary>
     public Color m_initialColor;
     /// <summary>
-    /// default active color
+    /// 默认indicator的激活颜色
     /// </summary>
     public Color m_activeColor = new Color(.6f, .2f, .2f);
 
     /// <summary>
-    /// Initialize the data
+    /// 在脚本enable的时候调用
     /// </summary>
+    /// <remarks>
+    /// <para>后于所有物体的<c>Awake</c>函数之后调用，可用于处理初始化依赖</para>
+    /// <para>先于<c>Update</c>函数之前调用</para>
+    /// </remarks>
     void Start()
     {
         m_initialColor = GetComponent<MeshRenderer>().material.color;
     }
 
     /// <summary>
-    /// Triggered when other collider enter
+    /// 当触发器碰撞发生时被调用
     /// </summary>
-    /// <param name="collider">The collider collided with this</param>
+    /// <param name="collider">与之发生碰撞的物体</param>
+    /// <remarks>
+    /// <para>1. 两个对象都要有<c>Collider</c></para>
+    /// <para>2. 一方需要<c>Collider.isTrigger on</c>以及<c>Rigidbody</c></para>
+    /// <para>3. 如果两者都<c>Collider.isTrigger on</c>，则无效（似乎触发器允许叠加）</para>
+    /// </remarks>
     void OnTriggerEnter(Collider collider)
     {
-        // 1. Change the material's color when it is collided by the arm
+        // 1. 如果进入碰撞对象名为“Extended Collider”
         if (collider.gameObject.name == "Extended Collider")
         {
+            // 2.CompareTo 修改该物体的颜色
             GetComponent<MeshRenderer>().material.color = m_activeColor;
         }
     }
 
     /// <summary>
-    /// Triggered when other collider exit
+    /// 当触发器碰撞结束时被调用
     /// </summary>
-    /// <param name="collider">The collider collided with this</param>
+    /// <param name="collider">与之发生碰撞的物体</param>
     void OnTriggerExit(Collider collider)
     {
-        // 1. Reset the material's color when the second arm exit
+        // 1. 如果离去碰撞对象名为“Extended Collider”
         if (collider.gameObject.name == "Extended Collider")
         {
+            // 2. 重置物体的颜色
             GetComponent<MeshRenderer>().material.color = m_initialColor;
         }
     }

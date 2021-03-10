@@ -34,6 +34,7 @@
 
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
+            // 1. 根据世界坐标x和y修改材质颜色
             o.Albedo.rg = IN.worldPos.xy*0.5+0.5;
             // Metallic and smoothness come from slider variables
             o.Metallic = _Metallic;

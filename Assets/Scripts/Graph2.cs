@@ -4,27 +4,34 @@ using UnityEngine;
 using System;
 
 /// <summary>
-/// This class is used as the script of the Graph Object in Mathmaticl Surfaces scene to display function graph
+/// 函数图形显示逻辑
 /// </summary>
 public class Graph2 : MonoBehaviour
 {
     /// <summary>
-    /// The prefab used to display a point on a funcion
+    /// 用于表示点的预制体
     /// </summary>
     public Transform PointPrefab;
 
     /// <summary>
-    /// The number of the points
+    /// 点的分辨率
     /// </summary>
+    /// <remarks>
+    /// 越大点越密
+    /// </remarks>
     [Range(10, 100)]
     public int resolution = 10;
 
     /// <summary>
-    /// All the points to display a funcion
+    /// 所有用于显示的点
     /// </summary>
-    Transform[] points;
+    Transform[] m_points;
 
-    static GraphFunction[] functions = {
+    /// <summary>
+    /// 所有的图形显示函数
+    /// </summary>
+    /// <value>图形显示函数</value>
+    readonly static GraphFunction[] functions = {
         SineFunction,
         Sine2DFunction,
         MultipleSineFunction,
@@ -35,63 +42,73 @@ public class Graph2 : MonoBehaviour
         Torus
     };
 
+    /// <summary>
+    /// 图形函数名，用于editor中下拉列表选择
+    /// </summary>
     public GraphFunctionName functionName;
 
-    const float Pi = Mathf.PI;
+    /// <summary>
+    /// 圆周率近似值
+    /// </summary>
+    readonly static float Pi = Mathf.PI;
 
     /// <summary>
-    /// Triggered when awake
+    /// 脚本被加载时调用
     /// </summary>
     void Awake()
     {
-        // 1. Initialize all function points and store them
+        // 1. 初始化图形绘制相关参数
         float step = 2.0f / resolution;
         Vector3 scale = Vector3.one * step;
-        points = new Transform[resolution * resolution];
-        for (int i = 0; i < points.Length; i++)
+        m_points = new Transform[resolution * resolution];
+        // 2. 创建点并存储之
+        for (int i = 0; i < m_points.Length; i++)
         {
-            points[i] = Instantiate(PointPrefab);
-            points[i].localScale = scale;
-            points[i].SetParent(transform, false);
+            m_points[i] = Instantiate(PointPrefab);
+            m_points[i].localScale = scale;
+            m_points[i].SetParent(transform, false);
         }
     }
 
     /// <summary>
-    /// Triggered at each frame
+    /// 每帧被调用
     /// </summary>
     void Update()
     {
-        // 1. update function points position
+        // 1. 设定图形绘制的当前参数
         GraphFunction f = functions[(int)functionName];
         float step = 2f / resolution;
         float t = Time.time;
+        // 2. 修改点的当前位置
         for (int i = 0, z = 0; z < resolution; z++)
         {
             float v = (z + 0.5f) * step - 1f;
             for (int x = 0; x < resolution; x++, i++)
             {
                 float u = (x + 0.5f) * step - 1f;
-                points[i].localPosition = f(u, v, t);
+                m_points[i].localPosition = f(u, v, t);
             }
         }
     }
 
     /// <summary>
-    /// Sine function
+    /// 一维输入输出正弦函数
     /// </summary>
-    /// <param name="x">input x</param>
-    /// <param name="t">input time</param>
-    /// <returns>the calculation result</returns>
+    /// <param name="x">x坐标</param>
+    /// <param name="z">z坐标（无效）</param>
+    /// <param name="t">时间值</param>
+    /// <returns>y坐标</returns>
     static Vector3 SineFunction(float x, float z, float t)
     {
         return new Vector3(x, Mathf.Sin((x + t) * Pi), z);
     }
     /// <summary>
-    /// 2 sine functions overlay
+    /// 一维输入输出正弦函数（双正弦函数叠加）
     /// </summary>
-    /// <param name="x">input x</param>
-    /// <param name="t">input time</param>
-    /// <returns>the calculation result</returns>
+    /// <param name="x">x坐标</param>
+    /// <param name="z">z坐标（无效）</param>
+    /// <param name="t">时间值</param>
+    /// <returns>y坐标</returns>
     static Vector3 MultipleSineFunction(float x, float z, float t)
     {
         float y = Mathf.Sin((x + t) * Pi);
@@ -100,13 +117,29 @@ public class Graph2 : MonoBehaviour
         return new Vector3(x, y, z);
     }
 
+    /// <summary>
+    /// 二维输入一维输出的正弦函数（双正交一维输入sin函数叠加）
+    /// </summary>
+    /// <param name="x">x坐标</param>
+    /// <param name="z">z坐标</param>
+    /// <param name="t">时间值</param>
+    /// <returns>y坐标</returns>
     static Vector3 Sine2DFunction(float x, float z, float t)
     {
+        // 1. 根据输入的坐标计算待显示点的位置并返回
         return new Vector3(x, (Mathf.Sin(Pi * (x + t)) + Mathf.Sin(Pi * (z + t))) * .5f, z);
     }
 
+    /// <summary>
+    /// 二维输入一维输出的正弦函数（多个一维输入sin函数叠加）
+    /// </summary>
+    /// <param name="x">x坐标</param>
+    /// <param name="z">z坐标</param>
+    /// <param name="t">时间值</param>
+    /// <returns>y坐标</returns>
     static Vector3 MultipleSine2DFunction(float x, float z, float t)
     {
+        // 1. 根据输入的坐标和t值计算待显示点的位置
         Vector3 p;
         p.x = x;
         p.z = z;
@@ -116,43 +149,75 @@ public class Graph2 : MonoBehaviour
         return new Vector3(x, p.y * 1f / 5.5f, z);
     }
 
+    /// <summary>
+    /// 波纹函数
+    /// </summary>
+    /// <param name="x">x坐标</param>
+    /// <param name="z">z坐标</param>
+    /// <param name="t">时间值</param>
+    /// <returns>y坐标</returns>
     static Vector3 Ripple(float x, float z, float t)
     {
+        // 1. 根据输入的坐标和t值计算待显示点的位置并返回
         float dis = Mathf.Sqrt(x * x + z * z);
         return new Vector3(x, Mathf.Sin(4 * Pi * dis - 4 * t) / (10 * dis * dis + 5), z);
     }
 
-    static Vector3 Cylinder(float theta, float v, float t)
+    /// <summary>
+    /// 柱面函数
+    /// </summary>
+    /// <param name="u">u坐标</param>
+    /// <param name="v">v坐标</param>
+    /// <param name="t">时间值</param>
+    /// <returns>点坐标</returns>
+    static Vector3 Cylinder(float u, float v, float t)
     {
+        // 1. 根据输入的u、v、t值计算待显示点的位置并返回
         Vector3 p;
-        float r = 0.8f + Mathf.Sin(Pi * (6f * theta + 2f * v + t)) * 0.2f;
-        p.x = r * Mathf.Sin(theta * Pi);
+        float r = 0.8f + Mathf.Sin(Pi * (6f * u + 2f * v + t)) * 0.2f;
+        p.x = r * Mathf.Sin(u * Pi);
         p.y = v;
-        p.z = r * Mathf.Cos(theta * Pi);
+        p.z = r * Mathf.Cos(u * Pi);
         return p;
     }
 
-    static Vector3 Sphere(float theta, float v, float t) // 其实是个极坐标+一根直角坐标，直角坐标的粒度也是变动的
+    /// <summary>
+    /// 球函数
+    /// </summary>
+    /// <param name="u">u坐标</param>
+    /// <param name="v">v坐标</param>
+    /// <param name="t">时间值</param>
+    /// <returns>点坐标</returns>
+    static Vector3 Sphere(float u, float v, float t) // 其实是个极坐标+一根直角坐标，直角坐标的粒度也是变动的
     {
+        // 1. 根据输入的u、v、t值计算待显示点的位置并返回
         Vector3 p;
-        float r = 0.8f + Mathf.Sin(Pi * (6f * theta + t)) * .1f;
+        float r = 0.8f + Mathf.Sin(Pi * (6f * u + t)) * .1f;
         r += Mathf.Sin(Pi * (4f * v + t)) * 0.1f; // 如果想退化成球，使用固定值即可
         float s = r * Mathf.Cos(Pi * 0.5f * v);
-        p.x = s * Mathf.Sin(theta * Pi);
+        p.x = s * Mathf.Sin(u * Pi);
         p.y = r * Mathf.Sin(Pi * 0.5f * v);
-        p.z = s * Mathf.Cos(theta * Pi);
+        p.z = s * Mathf.Cos(u * Pi);
         return p;
     }
 
-    static Vector3 Torus(float theta, float v, float t)
+    /// <summary>
+    /// 圆环面函数
+    /// </summary>
+    /// <param name="u">u坐标</param>
+    /// <param name="v">v坐标</param>
+    /// <param name="t">时间值</param>
+    /// <returns>点坐标</returns>
+    static Vector3 Torus(float u, float v, float t)
     {
+        // 1. 根据输入的u、v、t值计算待显示点的位置并返回
         Vector3 p;
-        float r1 = 0.65f + Mathf.Sin(Pi * (6f * theta + t)) * 0.1f;
+        float r1 = 0.65f + Mathf.Sin(Pi * (6f * u + t)) * 0.1f;
         float r2 = 0.2f + Mathf.Sin(Pi * (4f * v + t)) * 0.05f;
         float s = r2 * Mathf.Cos(Pi * v) + r1;
-        p.x = s * Mathf.Sin(theta * Pi);
+        p.x = s * Mathf.Sin(u * Pi);
         p.y = r2 * Mathf.Sin(Pi * v);
-        p.z = s * Mathf.Cos(theta * Pi);
+        p.z = s * Mathf.Cos(u * Pi);
         return p;
     }
 }
