@@ -61,7 +61,7 @@ public class Graph2 : MonoBehaviour
         float step = 2.0f / resolution;
         Vector3 scale = Vector3.one * step;
         m_points = new Transform[resolution * resolution];
-        // 2. 创建点并存储之
+        // 2. 创建所有点并存储之
         for (int i = 0; i < m_points.Length; i++)
         {
             m_points[i] = Instantiate(PointPrefab);
@@ -79,7 +79,7 @@ public class Graph2 : MonoBehaviour
         GraphFunction f = functions[(int)functionName];
         float step = 2f / resolution;
         float t = Time.time;
-        // 2. 修改点的当前位置
+        // 2. 修改所有点的当前位置
         for (int i = 0, z = 0; z < resolution; z++)
         {
             float v = (z + 0.5f) * step - 1f;
@@ -111,6 +111,7 @@ public class Graph2 : MonoBehaviour
     /// <returns>y坐标</returns>
     static Vector3 MultipleSineFunction(float x, float z, float t)
     {
+        // 1. 根据输入的坐标x计算待显示点的位置并返回
         float y = Mathf.Sin((x + t) * Pi);
         y += Mathf.Sin((x + 2f * t) * 2f * Pi);
         y *= 2f / 3f;

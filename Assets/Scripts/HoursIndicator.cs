@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 控制Hours Indicator根据秒针移动变色的逻辑
+/// </summary>
 public class HoursIndicator : MonoBehaviour
 {
     /// <summary>
@@ -22,6 +25,7 @@ public class HoursIndicator : MonoBehaviour
     /// </remarks>
     void Start()
     {
+        // 1. 记录初始颜色
         m_initialColor = GetComponent<MeshRenderer>().material.color;
     }
 

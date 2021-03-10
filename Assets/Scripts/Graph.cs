@@ -32,7 +32,7 @@ public class Graph : MonoBehaviour
     /// </summary>
     void Awake()
     {
-        // 1. 显示一整个面（用于查看shader的效果）
+        // 1. 使用点显示一整个面（用于查看shader的效果）
         float step = 2.0f / m_resolution;
         Vector3 scale = Vector3.one * step;
         Vector3 position;

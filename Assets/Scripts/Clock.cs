@@ -57,8 +57,9 @@ public class Clock : MonoBehaviour
     /// </summary>
     void UpdateDiscrete()
     {
-        // 1. 使用分立的时间表示（DataTime）来表示当前时间并设置表针位置
+        // 1. 使用分立的时间表示（DataTime）得到当前时间
         DateTime currentTime = DateTime.Now;
+        // 2. 设置各表针位置
         HoursTransform.localRotation = Quaternion.Euler(0f, currentTime.Hour * m_degreesPerHour, 0f);
         MinutesTransform.localRotation = Quaternion.Euler(0f, currentTime.Minute * m_degreesPerMinute, 0f);
         SecondsTransform.localRotation = Quaternion.Euler(0f, currentTime.Second * m_degreesPerSecond, 0f);
@@ -69,8 +70,9 @@ public class Clock : MonoBehaviour
     /// </summary>
     void UpdateContinuous()
     {
-        // 1. 使用连续的时间表示（TimeOfDay）来表示当前时间并设置表针位置
+        // 1. 使用连续的时间表示（TimeOfDay）得到当前时间
         TimeSpan currentTime = DateTime.Now.TimeOfDay;
+        // 2. 设置表针位置
         HoursTransform.localRotation = Quaternion.Euler(0f, (float)currentTime.TotalHours * m_degreesPerHour, 0f);
         MinutesTransform.localRotation = Quaternion.Euler(0f, (float)currentTime.TotalMinutes * m_degreesPerMinute, 0f);
         SecondsTransform.localRotation = Quaternion.Euler(0f, (float)currentTime.TotalSeconds * m_degreesPerSecond, 0f);
